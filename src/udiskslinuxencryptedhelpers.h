@@ -42,6 +42,8 @@ typedef struct {
   gboolean system;
   gboolean read_only;
   gboolean discard;
+  gboolean try_tokens;
+  GString *pin;
   const gchar *type;
   const gchar *pbkdf;
   guint32 memory;
@@ -90,6 +92,12 @@ gboolean bitlk_close_job_func (UDisksThreadedJob  *job,
                                GCancellable       *cancellable,
                                gpointer            user_data,
                                GError            **error);
+
+gboolean luks_open_with_tokens_job_func (UDisksThreadedJob  *job,
+                                          GCancellable       *cancellable,
+                                          gpointer            user_data,
+                                          GError            **error);
+
 G_END_DECLS
 
 #endif /* __UDISKS_LINUX_ENCRYPTED_HELPERS_H__ */

@@ -27,6 +27,7 @@ AM_CPPFLAGS =                                                                  \
 	$(GIO_CFLAGS)                                                          \
 	$(GMODULE_CFLAGS)                                                      \
 	$(BLOCKDEV_CFLAGS)                                                     \
+	$(LIBCRYPTSETUP_CFLAGS)                                                \
 	$(WARN_CFLAGS)                                                         \
 	$(NULL)
 
@@ -74,6 +75,8 @@ libudisks_daemon_la_SOURCES =                                                   
 	udiskslinuxfilesystemhelpers.h   udiskslinuxfilesystemhelpers.c          \
 	udiskslinuxencrypted.h           udiskslinuxencrypted.c                  \
 	udiskslinuxencryptedhelpers.h    udiskslinuxencryptedhelpers.c           \
+	udisksblockdevcompat.h                                                  \
+	udisksfido2.h                    udisksfido2.c                           \
 	udiskslinuxswapspace.h           udiskslinuxswapspace.c                  \
 	udiskslinuxloop.h                udiskslinuxloop.c                       \
 	udiskslinuxdriveobject.h         udiskslinuxdriveobject.c                \
@@ -128,6 +131,7 @@ libudisks_daemon_la_CFLAGS =                                                   \
 	$(LIBELOGIND_CFLAGS)                                                   \
 	$(PART_CFLAGS)                                                         \
 	$(SWAP_CFLAGS)                                                         \
+	$(LIBCRYPTSETUP_CFLAGS)                                                \
 	$(NULL)
 
 libudisks_daemon_la_LIBADD =                                                   \
@@ -137,6 +141,7 @@ libudisks_daemon_la_LIBADD =                                                   \
 	$(GUDEV_LIBS)                                                          \
 	$(BLOCKDEV_LIBS)                                                       \
 	-lbd_utils                                                             \
+	$(LIBCRYPTSETUP_LIBS)                                                  \
 	$(LIBBLKID_LIBS)                                                       \
 	$(LIBMOUNT_LIBS)                                                       \
 	$(LIBUUID_LIBS)                                                        \

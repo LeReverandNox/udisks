@@ -40,6 +40,7 @@
 #include "udiskssimplejob.h"
 #include "udisksthreadedjob.h"
 #include "udiskslinuxdevice.h"
+#include "udisksblockdevcompat.h"
 
 /**
  * SECTION:udiskslinuxnvmecontroller

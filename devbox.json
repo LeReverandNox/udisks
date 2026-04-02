@@ -20,10 +20,10 @@
     ],
     "scripts": {
       "bootstrap": [
-        "gtkdocize && autoreconf -fi && CPPFLAGS=-I/usr/include ./configure --enable-debug"
+        "gtkdocize && autoreconf -fi && CPPFLAGS=-I/usr/include LDFLAGS=\"-L/usr/lib -Wl,-rpath-link,/usr/lib\" ./configure --enable-debug --disable-man"
       ],
       "build": [
-        "make -j$(nproc) && patchelf --set-interpreter /lib64/ld-linux-x86-64.so.2 --set-runpath /usr/lib src/.libs/udisksd"
+        "make -j$(nproc) && patchelf --set-interpreter /lib64/ld-linux-x86-64.so.2 --set-rpath /usr/lib src/.libs/udisksd"
       ],
       "test": [
         "make check"

@@ -21,10 +21,12 @@
  */
 
 #include <glib.h>
-#include <blockdev/crypto.h>
+#include "udisksblockdevcompat.h"
+#include <libcryptsetup.h>
 
 #include "udisksthreadedjob.h"
 #include "udiskslinuxencryptedhelpers.h"
+#include "udiskslogging.h"
 
 gboolean luks_format_job_func (UDisksThreadedJob  *job,
                       GCancellable       *cancellable,
@@ -209,4 +211,155 @@ gboolean bitlk_close_job_func (UDisksThreadedJob  *job,
 {
   CryptoJobData *data = (CryptoJobData*) user_data;
   return bd_crypto_bitlk_close (data->map_name, error);
+}
+
+/**
+ * luks_open_with_tokens_job_func:
+ *
+ * ThreadedJob function that unlocks a LUKS2 device via enrolled security
+ * tokens.  libcryptsetup iterates all enrolled tokens in header order and
+ * calls each token type's plugin (e.g. the systemd-fido2 plugin, which
+ * handles PIN prompting via systemd-ask-password and user-presence waiting
+ * via libfido2 internally).
+ *
+ * If all tokens fail and a passphrase is present in @user_data, the function
+ * falls back to passphrase-based unlock via libblockdev.
+ */
+gboolean
+luks_open_with_tokens_job_func (UDisksThreadedJob  *job,
+                                 GCancellable       *cancellable,
+                                 gpointer            user_data,
+                                 GError            **error)
+{
+  CryptoJobData *data = (CryptoJobData *) user_data;
+  struct crypt_device *cd = NULL;
+  uint32_t activate_flags = 0;
+  int r;
+  gboolean ret = FALSE;
+
+  r = crypt_init (&cd, data->device);
+  if (r < 0)
+    {
+      g_set_error (error,
+                   UDISKS_ERROR,
+                   UDISKS_ERROR_FAILED,
+                   "Failed to initialise libcryptsetup for %s: %s",
+                   data->device, g_strerror (-r));
+      return FALSE;
+    }
+
+  crypt_set_log_callback (cd, NULL, NULL);
+
+  r = crypt_load (cd, CRYPT_LUKS2, NULL);
+  if (r < 0)
+    {
+      g_set_error (error,
+                   UDISKS_ERROR,
+                   UDISKS_ERROR_FAILED,
+                   "%s is not a LUKS2 device; token-based unlock requires LUKS2",
+                   data->device);
+      goto out;
+    }
+
+  if (data->read_only)
+    activate_flags |= CRYPT_ACTIVATE_READONLY;
+  if (data->discard)
+    activate_flags |= CRYPT_ACTIVATE_ALLOW_DISCARDS;
+
+  /* Try all enrolled tokens in header order.  Each token plugin handles its
+   * own user interaction (PIN prompts, user-presence wait, etc.).
+   * Pass the PIN directly when provided so token plugins do not need to
+   * use the systemd-ask-password agent (which is unavailable in the daemon
+   * context without a running session agent). */
+  if (data->pin != NULL && data->pin->len > 0)
+    r = crypt_activate_by_token_pin (cd, data->map_name, NULL, CRYPT_ANY_TOKEN,
+                                     data->pin->str, data->pin->len,
+                                     NULL, activate_flags);
+  else
+    r = crypt_activate_by_token (cd, data->map_name, CRYPT_ANY_TOKEN, NULL, activate_flags);
+  if (r >= 0)
+    {
+      ret = TRUE;
+      goto out;
+    }
+
+  udisks_debug ("Token-based unlock of %s failed (errno %d: %s)%s",
+                data->device, -r, g_strerror (-r),
+                (data->passphrase && data->passphrase->len > 0)
+                  ? ", falling back to passphrase" : "");
+
+  /* Fall back to passphrase/keyfile if the caller provided one. */
+  if (data->passphrase != NULL && data->passphrase->len > 0)
+    {
+      BDCryptoKeyslotContext *context = NULL;
+      BDCryptoOpenFlags bd_flags = 0;
+
+      crypt_free (cd);
+      cd = NULL;
+
+      context = bd_crypto_keyslot_context_new_passphrase (
+                    (const guint8 *) data->passphrase->str,
+                    data->passphrase->len, error);
+      if (!context)
+        goto out;
+
+      if (data->read_only)
+        bd_flags |= BD_CRYPTO_OPEN_READONLY;
+      if (data->discard)
+        bd_flags |= BD_CRYPTO_OPEN_ALLOW_DISCARDS;
+
+      ret = bd_crypto_luks_open_flags (data->device, data->map_name,
+                                       context, bd_flags, error);
+      bd_crypto_keyslot_context_free (context);
+      goto out;
+    }
+
+  /* No passphrase fallback available — report the token failure. */
+  switch (-r)
+    {
+    case ENOANO:
+      g_set_error (error,
+                   UDISKS_ERROR,
+                   UDISKS_ERROR_FAILED,
+                   "No FIDO2/security token matching any enrolled credential "
+                   "was found on %s. Ensure the token is inserted.",
+                   data->device);
+      break;
+    case ENOENT:
+      g_set_error (error,
+                   UDISKS_ERROR,
+                   UDISKS_ERROR_FAILED,
+                   "No token handler found for any enrolled token on %s. "
+                   "Ensure the appropriate token plugin (e.g. "
+                   "libcryptsetup-plugin-systemd-fido2) is installed.",
+                   data->device);
+      break;
+    case EPERM:
+      g_set_error (error,
+                   UDISKS_ERROR,
+                   UDISKS_ERROR_FAILED,
+                   "Token authentication failed for %s: wrong PIN or "
+                   "user verification rejected.",
+                   data->device);
+      break;
+    case ETIMEDOUT:
+      g_set_error (error,
+                   UDISKS_ERROR,
+                   UDISKS_ERROR_FAILED,
+                   "Token unlock of %s timed out waiting for user presence.",
+                   data->device);
+      break;
+    default:
+      g_set_error (error,
+                   UDISKS_ERROR,
+                   UDISKS_ERROR_FAILED,
+                   "Token unlock of %s failed: %s",
+                   data->device, g_strerror (-r));
+      break;
+    }
+
+ out:
+  if (cd != NULL)
+    crypt_free (cd);
+  return ret;
 }
