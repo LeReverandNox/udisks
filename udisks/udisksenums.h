@@ -46,6 +46,8 @@ G_BEGIN_DECLS
  * @UDISKS_ERROR_TIMED_OUT: The operation timed out.
  * @UDISKS_ERROR_WOULD_WAKEUP: The operation would wake up a disk that is in a deep-sleep state.
  * @UDISKS_ERROR_DEVICE_BUSY: Attempting to unmount a device that is busy.
+ * @UDISKS_ERROR_TOKEN_NOT_FOUND: No security token matching any enrolled credential was found.
+ * @UDISKS_ERROR_TOKEN_REQUIRES_PIN: A security token was found but requires a PIN; retry with the 'pin' option.
  *
  * Error codes for the #UDISKS_ERROR error domain and the
  * corresponding D-Bus error names.
@@ -78,10 +80,12 @@ typedef enum
   UDISKS_ERROR_ISCSI_NO_OBJECTS_FOUND,        /* org.freedesktop.UDisks2.Error.ISCSI.NoObjectsFound */
   UDISKS_ERROR_ISCSI_NOT_CONNECTED,           /* org.freedesktop.UDisks2.Error.ISCSI.NotConnected */
   UDISKS_ERROR_ISCSI_TRANSPORT_FAILED,        /* org.freedesktop.UDisks2.Error.ISCSI.TransportFailed */
-  UDISKS_ERROR_ISCSI_UNKNOWN_DISCOVERY_TYPE   /* org.freedesktop.UDisks2.Error.ISCSI.UnknownDiscoveryType */
+  UDISKS_ERROR_ISCSI_UNKNOWN_DISCOVERY_TYPE,  /* org.freedesktop.UDisks2.Error.ISCSI.UnknownDiscoveryType */
+  UDISKS_ERROR_TOKEN_NOT_FOUND,               /* org.freedesktop.UDisks2.Error.TokenNotFound */
+  UDISKS_ERROR_TOKEN_REQUIRES_PIN             /* org.freedesktop.UDisks2.Error.TokenRequiresPin */
 } UDisksError;
 
-#define UDISKS_ERROR_NUM_ENTRIES  (UDISKS_ERROR_ISCSI_UNKNOWN_DISCOVERY_TYPE + 1)
+#define UDISKS_ERROR_NUM_ENTRIES  (UDISKS_ERROR_TOKEN_REQUIRES_PIN + 1)
 
 /**
  * UDisksPartitionTypeInfoFlags:

@@ -3094,6 +3094,21 @@
         falls back to passphrase-based unlock.  If no token succeeds and no
         passphrase is provided, an error is returned.
 
+        Error codes returned by this method:
+        <itemizedlist>
+          <listitem><para>
+            <literal>org.freedesktop.UDisks2.Error.TokenRequiresPin</literal>
+            — no PIN was supplied but a token that requires one is enrolled;
+            prompt the user for a PIN and retry with the <parameter>pin</parameter>
+            option.
+          </para></listitem>
+          <listitem><para>
+            <literal>org.freedesktop.UDisks2.Error.TokenNotFound</literal>
+            — a PIN was supplied but no matching token device was found; ensure
+            the correct security key is inserted.
+          </para></listitem>
+        </itemizedlist>
+
         This method requires the device to be LUKS2; LUKS1, TCRYPT and BITLK
         devices do not support tokens.
 
