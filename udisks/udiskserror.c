@@ -60,6 +60,8 @@ static const GDBusErrorEntry dbus_error_entries[] =
   {UDISKS_ERROR_ISCSI_NOT_CONNECTED,          "org.freedesktop.UDisks2.Error.ISCSI.NotConnected"},
   {UDISKS_ERROR_ISCSI_TRANSPORT_FAILED,       "org.freedesktop.UDisks2.Error.ISCSI.TransportFailed"},
   {UDISKS_ERROR_ISCSI_UNKNOWN_DISCOVERY_TYPE, "org.freedesktop.UDisks2.Error.ISCSI.UnknownDiscoveryType"},
+  {UDISKS_ERROR_TOKEN_NOT_FOUND,              "org.freedesktop.UDisks2.Error.TokenNotFound"},
+  {UDISKS_ERROR_TOKEN_REQUIRES_PIN,           "org.freedesktop.UDisks2.Error.TokenRequiresPin"},
 };
 
 GQuark

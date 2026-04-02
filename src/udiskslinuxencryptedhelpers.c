@@ -318,12 +318,24 @@ luks_open_with_tokens_job_func (UDisksThreadedJob  *job,
   switch (-r)
     {
     case ENOANO:
-      g_set_error (error,
-                   UDISKS_ERROR,
-                   UDISKS_ERROR_FAILED,
-                   "No FIDO2/security token matching any enrolled credential "
-                   "was found on %s. Ensure the token is inserted.",
-                   data->device);
+      /* ENOANO means either no matching physical device was found, or the token
+       * requires a PIN that was not supplied.  Use the presence of a PIN in the
+       * job data as a heuristic to distinguish the two cases so that graphical
+       * applications can show the appropriate dialog. */
+      if (data->pin == NULL || data->pin->len == 0)
+        g_set_error (error,
+                     UDISKS_ERROR,
+                     UDISKS_ERROR_TOKEN_REQUIRES_PIN,
+                     "Token unlock of %s requires a PIN. "
+                     "Retry the call with the 'pin' option.",
+                     data->device);
+      else
+        g_set_error (error,
+                     UDISKS_ERROR,
+                     UDISKS_ERROR_TOKEN_NOT_FOUND,
+                     "No FIDO2/security token matching any enrolled credential "
+                     "was found on %s. Ensure the correct token is inserted.",
+                     data->device);
       break;
     case ENOENT:
       g_set_error (error,
