@@ -1,0 +1,33 @@
+{
+  "$schema":  "https://raw.githubusercontent.com/jetify-com/devbox/0.17.1/.schema/devbox.schema.json",
+  "packages": [
+    "gtk-doc@latest"
+  ],
+  "shell": {
+    "init_hook": [
+      "# devbox provides: gtkdocize",
+      "# The following must also be installed from the host system:",
+      "#",
+      "#   Arch Linux:",
+      "#     sudo pacman -S base-devel glib2-devel libblockdev cryptsetup libgudev polkit",
+      "#",
+      "#   Debian/Ubuntu:",
+      "#     sudo apt install autoconf automake libtool pkg-config libglib2.0-dev-bin \\",
+      "#       libblockdev-dev libcryptsetup-dev libgudev-1.0-dev \\",
+      "#       libpolkit-gobject-1-dev libsystemd-dev libudev-dev \\",
+      "#       libacl1-dev libblkid-dev uuid-dev",
+      "echo 'devbox ready — gtkdocize provided by devbox; all other build tools must come from the host system (see init_hook for details)'"
+    ],
+    "scripts": {
+      "bootstrap": [
+        "gtkdocize && autoreconf -fi && CPPFLAGS=-I/usr/include ./configure --enable-debug"
+      ],
+      "build": [
+        "make -j$(nproc) && patchelf --set-interpreter /lib64/ld-linux-x86-64.so.2 --set-runpath /usr/lib src/.libs/udisksd"
+      ],
+      "test": [
+        "make check"
+      ]
+    }
+  }
+}

@@ -1,0 +1,57 @@
+{
+  "lockfile_version": "1",
+  "packages": {
+    "github:NixOS/nixpkgs/nixpkgs-unstable": {
+      "last_modified": "2026-03-23T13:48:00Z",
+      "resolved": "github:NixOS/nixpkgs/fdc7b8f7b30fdbedec91b71ed82f36e1637483ed?lastModified=1774273680"
+    },
+    "gtk-doc@latest": {
+      "last_modified": "2026-03-21T07:29:51Z",
+      "resolved": "github:NixOS/nixpkgs/09061f748ee21f68a089cd5d91ec1859cd93d0be#gtk-doc",
+      "source": "devbox-search",
+      "version": "1.35.1",
+      "systems": {
+        "aarch64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/3mpy61pvmj6lz4nipcm6rgs1kpjh1yqx-gtk-doc-1.35.1",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/3mpy61pvmj6lz4nipcm6rgs1kpjh1yqx-gtk-doc-1.35.1"
+        },
+        "aarch64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/i66dycrp9qq8zm7b5wpwmvfb727p9g1n-gtk-doc-1.35.1",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/i66dycrp9qq8zm7b5wpwmvfb727p9g1n-gtk-doc-1.35.1"
+        },
+        "x86_64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/8sh8aixbkc99m78n6q5kgp7bj07c64il-gtk-doc-1.35.1",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/8sh8aixbkc99m78n6q5kgp7bj07c64il-gtk-doc-1.35.1"
+        },
+        "x86_64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/a0szg23rrsm61vzy0m81r275px4manhh-gtk-doc-1.35.1",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/a0szg23rrsm61vzy0m81r275px4manhh-gtk-doc-1.35.1"
+        }
+      }
+    }
+  }
+}

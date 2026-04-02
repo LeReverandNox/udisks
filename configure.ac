@@ -176,6 +176,10 @@ if test "x$enable_daemon" = "xyes"; then
   AC_SUBST(BLOCKDEV_CFLAGS)
   AC_SUBST(BLOCKDEV_LIBS)
 
+  PKG_CHECK_MODULES(LIBCRYPTSETUP, [libcryptsetup >= 2.4])
+  AC_SUBST(LIBCRYPTSETUP_CFLAGS)
+  AC_SUBST(LIBCRYPTSETUP_LIBS)
+
   PKG_CHECK_MODULES(LIBBLKID, [blkid])
   AC_SUBST(LIBBLKID_CFLAGS)
   AC_SUBST(LIBBLKID_LIBS)
@@ -296,7 +300,7 @@ if test "x$enable_lvm2" = "xyes" \
   SAVE_CFLAGS=$CFLAGS
   SAVE_LDFLAGS=$LDFLAGS
 
-  CFLAGS="$GLIB_CFLAGS"
+  CFLAGS="$GLIB_CFLAGS $BLOCKDEV_CFLAGS"
   LDFLAGS="$GLIB_LIBS"
   AC_MSG_CHECKING([libblockdev-lvm presence])
   AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <blockdev/lvm.h>]], [[]])],[AC_MSG_RESULT([yes])
@@ -366,7 +370,7 @@ if test "x$enable_btrfs" = "xyes" \
     # libblockdev
     SAVE_CFLAGS=$CFLAGS
     SAVE_LDFLAGS=$LDFLAGS
-    CFLAGS="$GLIB_CFLAGS"
+    CFLAGS="$GLIB_CFLAGS $BLOCKDEV_CFLAGS"
     LDFLAGS="$GLIB_LIBS"
     # We don't use AC_CHECK_HEADER to avoid these warnings:
     #   - accepted by the compiler, rejected by the preprocessor!
@@ -426,7 +430,7 @@ if test "x$enable_daemon" = "xyes"; then
   SAVE_CFLAGS=$CFLAGS
   SAVE_LDFLAGS=$LDFLAGS
 
-  CFLAGS="$GLIB_CFLAGS"
+  CFLAGS="$GLIB_CFLAGS $BLOCKDEV_CFLAGS"
   LDFLAGS="$GLIB_LIBS"
   AC_MSG_CHECKING([libblockdev-part presence])
   AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <blockdev/part.h>]], [[]])],[AC_MSG_RESULT([yes])
@@ -444,7 +448,7 @@ if test "x$enable_daemon" = "xyes"; then
   SAVE_CFLAGS=$CFLAGS
   SAVE_LDFLAGS=$LDFLAGS
 
-  CFLAGS="$GLIB_CFLAGS"
+  CFLAGS="$GLIB_CFLAGS $BLOCKDEV_CFLAGS"
   LDFLAGS="$GLIB_LIBS"
   AC_MSG_CHECKING([libblockdev-loop presence])
   AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <blockdev/loop.h>]], [[]])],[AC_MSG_RESULT([yes])
@@ -462,7 +466,7 @@ if test "x$enable_daemon" = "xyes"; then
   SAVE_CFLAGS=$CFLAGS
   SAVE_LDFLAGS=$LDFLAGS
 
-  CFLAGS="$GLIB_CFLAGS"
+  CFLAGS="$GLIB_CFLAGS $BLOCKDEV_CFLAGS"
   LDFLAGS="$GLIB_LIBS"
   AC_MSG_CHECKING([libblockdev-swap presence])
   AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <blockdev/swap.h>]], [[]])],[AC_MSG_RESULT([yes])
@@ -480,7 +484,7 @@ if test "x$enable_daemon" = "xyes"; then
   SAVE_CFLAGS=$CFLAGS
   SAVE_LDFLAGS=$LDFLAGS
 
-  CFLAGS="$GLIB_CFLAGS"
+  CFLAGS="$GLIB_CFLAGS $BLOCKDEV_CFLAGS"
   LDFLAGS="$GLIB_LIBS"
   AC_MSG_CHECKING([libblockdev-mdraid presence])
   AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <blockdev/mdraid.h>]], [[]])],[AC_MSG_RESULT([yes])
@@ -498,7 +502,7 @@ if test "x$enable_daemon" = "xyes"; then
   SAVE_CFLAGS=$CFLAGS
   SAVE_LDFLAGS=$LDFLAGS
 
-  CFLAGS="$GLIB_CFLAGS"
+  CFLAGS="$GLIB_CFLAGS $BLOCKDEV_CFLAGS"
   LDFLAGS="$GLIB_LIBS"
   AC_MSG_CHECKING([libblockdev-fs presence])
   AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <blockdev/fs.h>]], [[]])],[AC_MSG_RESULT([yes])
@@ -516,7 +520,7 @@ if test "x$enable_daemon" = "xyes"; then
   SAVE_CFLAGS=$CFLAGS
   SAVE_LDFLAGS=$LDFLAGS
 
-  CFLAGS="$GLIB_CFLAGS"
+  CFLAGS="$GLIB_CFLAGS $BLOCKDEV_CFLAGS"
   LDFLAGS="$GLIB_LIBS"
   AC_MSG_CHECKING([libblockdev-crypto presence])
   AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <blockdev/crypto.h>]], [[]])],[AC_MSG_RESULT([yes])
@@ -534,7 +538,7 @@ if test "x$enable_daemon" = "xyes"; then
   SAVE_CFLAGS=$CFLAGS
   SAVE_LDFLAGS=$LDFLAGS
 
-  CFLAGS="$GLIB_CFLAGS"
+  CFLAGS="$GLIB_CFLAGS $BLOCKDEV_CFLAGS"
   LDFLAGS="$GLIB_LIBS"
   AC_MSG_CHECKING([libblockdev-nvme presence])
   AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <blockdev/nvme.h>]], [[]])],[AC_MSG_RESULT([yes])
@@ -555,7 +559,7 @@ if test "x$enable_daemon" = "xyes"; then
     SAVE_CFLAGS=$CFLAGS
     SAVE_LDFLAGS=$LDFLAGS
 
-    CFLAGS="$GLIB_CFLAGS"
+    CFLAGS="$GLIB_CFLAGS $BLOCKDEV_CFLAGS"
     LDFLAGS="$GLIB_LIBS"
     AC_MSG_CHECKING([libblockdev-smart presence])
     AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <blockdev/smart.h>]], [[]])],
