@@ -2941,6 +2941,15 @@
     -->
     <property name="MetadataSize" type="t" access="read"/>
 
+    <!-- EnrolledTokenTypes:
+         An array of token type strings for LUKS2 tokens enrolled in the
+         device header.  Common values include "systemd-fido2",
+         "systemd-tpm2" and "systemd-pkcs11".  Empty for non-LUKS2 devices
+         or devices with no enrolled tokens.
+         @since: 2.12.0
+    -->
+    <property name="EnrolledTokenTypes" type="as" access="read"/>
+
     <!-- CleartextDevice:
          For an unlocked device, the object path of its cleartext device.
     -->
@@ -3052,6 +3061,48 @@
     <method name="HeaderBackup">
       <arg name="backup_file" direction="in" type="s"/>
       <arg name="options" direction="in" type="a{sv}"/>
+    </method>
+
+    <!--
+        UnlockWithTokens:
+        @options: Options - known options (in addition to <link
+          linkend="udisks-std-options">standard options</link>) include
+          <parameter>pin</parameter> (of type 's') which is passed directly to
+          token plugins that require a PIN (e.g. non-UV FIDO2 keys); this
+          bypasses the need for a running systemd-ask-password agent.
+          <parameter>passphrase</parameter> (of type 's') and
+          <parameter>keyfile_contents</parameter> (of type 'ay') are used as a
+          passphrase fallback if all tokens fail.
+          <parameter>read-only</parameter> (of type 'b') and
+          <parameter>discard</parameter> (of type 'b') control device-mapper
+          activation flags.
+        @cleartext_device: An object path to the unlocked object implementing
+          the #org.freedesktop.UDisks2.Block interface.
+        @since: 2.12.0
+
+        Unlocks a LUKS2 encrypted device using enrolled security tokens (e.g.
+        FIDO2 hardware keys).  Tokens are tried in the order they appear in the
+        LUKS2 header.  For UV-capable tokens (biometric verification), no PIN
+        is needed and the user is only prompted for physical touch.  For
+        non-UV tokens that require a PIN, the caller should supply the PIN via
+        the <parameter>pin</parameter> option; without it, token activation
+        will fail if no systemd-ask-password agent is available.
+
+        If all enrolled tokens fail or are unavailable and a
+        <parameter>passphrase</parameter> or
+        <parameter>keyfile_contents</parameter> option is provided, the method
+        falls back to passphrase-based unlock.  If no token succeeds and no
+        passphrase is provided, an error is returned.
+
+        This method requires the device to be LUKS2; LUKS1, TCRYPT and BITLK
+        devices do not support tokens.
+
+        Authorization is the same as for the
+        #org.freedesktop.UDisks2.Encrypted.Unlock() method.
+    -->
+    <method name="UnlockWithTokens">
+      <arg name="options" direction="in" type="a{sv}"/>
+      <arg name="cleartext_device" direction="out" type="o"/>
     </method>
 
   </interface>

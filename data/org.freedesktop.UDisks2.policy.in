@@ -95,6 +95,9 @@
 
   <!-- ###################################################################### -->
   <!-- Unlocking encrypted devices -->
+  <!-- Note: The UnlockWithTokens() D-Bus method (FIDO2 / security token unlock)
+       reuses these same action IDs. Token-based unlock carries the same
+       privilege level as passphrase-based unlock. -->
 
   <action id="org.freedesktop.udisks2.encrypted-unlock">
     <description>Unlock an encrypted device</description>
