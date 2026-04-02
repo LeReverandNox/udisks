@@ -907,12 +907,23 @@ handle_unlock_with_tokens (UDisksEncrypted        *encrypted,
                                                NULL, /* cancellable */
                                                &error))
     {
-      g_dbus_method_invocation_return_error (invocation,
-                                             UDISKS_ERROR,
-                                             UDISKS_ERROR_FAILED,
-                                             "Error unlocking %s: %s",
-                                             udisks_block_get_device (block),
-                                             error->message);
+      /* Propagate token-specific errors directly so callers can distinguish them.
+       * Other errors are wrapped with the device path for context. */
+      if (error->domain == UDISKS_ERROR &&
+          (error->code == UDISKS_ERROR_TOKEN_REQUIRES_PIN ||
+           error->code == UDISKS_ERROR_TOKEN_NOT_FOUND))
+        {
+          g_dbus_method_invocation_return_gerror (invocation, error);
+        }
+      else
+        {
+          g_dbus_method_invocation_return_error (invocation,
+                                                 UDISKS_ERROR,
+                                                 UDISKS_ERROR_FAILED,
+                                                 "Error unlocking %s: %s",
+                                                 udisks_block_get_device (block),
+                                                 error->message);
+        }
       g_clear_error (&error);
       udisks_linux_block_encrypted_unlock (block);
       goto out;
